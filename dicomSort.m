@@ -1,5 +1,5 @@
-function dicomSort(studyPath,output)
-% dicomSort Recursive dicom solrting tool.
+function dicomSort(studyPath,output,opt1)
+% dicomSort Recursive dicom sorting tool.
 %   dicomSort(input) sorts all dicom files for each subject in a study
 %   folder.
 %
@@ -13,8 +13,9 @@ function dicomSort(studyPath,output)
 %
 %   SEE ALSO ...
 
-%% Tunable unction Variables
-studyDir = dir(fullfile(studyPath,'**/*')); %   Recursive directory listing
+%% Tunable Function Variables
+studyDir = vertcat(dir(fullfile(studyPath,'**/*')),...
+    dir(fullfile(studyPath,'**/*.dcm'))); %   Recursive directory listing
 rmPattern = {'.','.DS_Store'};   %   Remove files beginning with
 
 %% Clean-up Directory Listing
@@ -41,25 +42,24 @@ fprintf('Found %d dicom files\n',nFiles);
 %   Run in parent parfor for speed
 parfor i = 1:nFiles
     tmp = dicominfo(fullfile(studyDir(i).folder,studyDir(i).name));
-    [~,tmpName,~] = fileparts(tmp.Filename);
-        sortStatus = fprintf('%d/%d: sorting %s',j,length(studyDir),...
-            tmp.SeriesDescription);
-        
-        if ~exist(fullfile(outPath,tmp.PatientID,tmp.ProtocolName),'dir')
-            mkdir(fullfile(outPath,tmp.PatientID,tmp.ProtocolName));
-        else
-            ;
-        end
-        if ~contains(tmpName,'.dcm')
-            newName = [tmpName '.dcm'];
-        else
-            newName = tmpName;
-        end
-        copyfile(tmp.Filename,fullfile(outPath,tmp.PatientID,...
-            tmp.ProtocolName,newName));
-        
-        fprintf('Sorting %s: %d/%d',tmp.PatientID,i,nFiles);
-end
-end
+    sortStatus = fprintf('%d/%d: sorting %s',j,length(studyDir),...
+        tmp.ProtocolName);
     
+    if ~exist(fullfile(outPath,tmp.PatientID,tmp.ProtocolName),'dir')
+        mkdir(fullfile(outPath,tmp.PatientID,tmp.ProtocolName));
+    else
+        ;
+    end
+    if ~contains(studyDir(i).name,'.dcm')
+        newName = [studyDir(i).name '.dcm'];
+    else
+        newName = studyDir(i).name;
+    end
+    copyfile(tmp.Filename,fullfile(outPath,tmp.PatientID,...
+        tmp.ProtocolName,newName));
+    
+    fprintf('Sorting %s: %d/%d',tmp.PatientID,i,nFiles);
+end
+end
+
 
