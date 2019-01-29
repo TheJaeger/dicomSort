@@ -41,25 +41,29 @@ fprintf('Found %d dicom files\n',nFiles);
 %% Sort Dicom Files
 %   Run in parent parfor for speed
 parfor i = 1:nFiles
-    tmp = dicominfo(fullfile(studyDir(i).folder,studyDir(i).name));
-    sortStatus = fprintf('%d/%d: sorting %s',j,length(studyDir),...
-        tmp.ProtocolName);
-    
-    if ~exist(fullfile(outPath,tmp.PatientID,tmp.ProtocolName),'dir')
-        mkdir(fullfile(outPath,tmp.PatientID,tmp.ProtocolName));
-    else
-        ;
+    try
+        tmp = dicominfo(fullfile(studyDir(i).folder,studyDir(i).name));
+    catch
+        continue
     end
-    if ~contains(studyDir(i).name,'.dcm')
-        newName = [studyDir(i).name '.dcm'];
-    else
-        newName = studyDir(i).name;
+        sortStatus = fprintf('%d/%d: sorting %s',j,length(studyDir),...
+            tmp.ProtocolName);
+        
+        if ~exist(fullfile(outPath,tmp.PatientID,tmp.ProtocolName),'dir')
+            mkdir(fullfile(outPath,tmp.PatientID,tmp.ProtocolName));
+        else
+            ;
+        end
+        if ~contains(studyDir(i).name,'.dcm')
+            newName = [studyDir(i).name '.dcm'];
+        else
+            newName = studyDir(i).name;
+        end
+        copyfile(tmp.Filename,fullfile(outPath,tmp.PatientID,...
+            tmp.ProtocolName,newName));
+        
+        fprintf('Sorting %s: %d/%d',tmp.PatientID,i,nFiles);
     end
-    copyfile(tmp.Filename,fullfile(outPath,tmp.PatientID,...
-        tmp.ProtocolName,newName));
-    
-    fprintf('Sorting %s: %d/%d',tmp.PatientID,i,nFiles);
-end
 end
 
 
