@@ -1,14 +1,12 @@
-dicomSort
-dicomSort Recursive dicom sorting tool.
-  dicomsort(input) recursive sorts all dicom files in a study folder
-  regardless of directory structure or hierarchy.
+# dicomsort
+This is a MATLAB function to sort all dicom files in a study directory regardless of folder structure or hierarchy. The input directory is recursively scanned and each file is tested for dicom format prior to being processed. As a multi-threaded script, it sorts dicoms as fast as the drive allows.
 
-  Syntax:
+  ### Syntax:
   dicomsort(input)
   dicomsort(input,output)
   dicomsort(__,Name,Value)
 
-  Description:
+  ### Description:
   dicomSort(input) sorts all dicom files in a study regardless of folder
   hierarchy
 
@@ -18,7 +16,7 @@ dicomSort Recursive dicom sorting tool.
   dicomsort(__,Name,Value) uses additional name-value pairs to customize
   sorting
 
-  Name-Value Pair Arguments:
+  ### Name-Value Pair Arguments:
   'output' --> output path
       Define an output directory for sorting
       Type: char | string
@@ -43,7 +41,7 @@ dicomSort Recursive dicom sorting tool.
       String to attach after subject name during creation of subject
       folder
 
-  Example:
+  ### Example:
   dicomsort('~/example_study/data');
       Sort all dicom files in ~/example_study/data
 
