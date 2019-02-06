@@ -192,18 +192,21 @@ parfor i = 1:nFiles
         tmp.PatientID = tmp.PatientID;
     end
     
+    %   Define copy/move folder
+    defineFolder = fullfile(outPath,tmp.PatientID,...
+            sprintf('%s_%d',tmp.ProtocolName,tmp.SeriesNumber));
+    
     %   Check if a directory 'PatientID/Protocol' exists. If it does, do
     %   nothing. Otherwise, make directry
-    if ~exist(fullfile(outPath,tmp.PatientID,tmp.ProtocolName),'dir')
-        mkdir(fullfile(outPath,tmp.PatientID,tmp.ProtocolName));
+    if ~exist(defineFolder,'dir')
+        mkdir(defineFolder);
     else
         ;
     end
     
     %   Check whether current file is already sorted. If it is, skip that
     %   file and take note of patient ID
-    if contains(tmp.Filename,...
-            fullfile(outPath,tmp.PatientID,tmp.ProtocolName))
+    if contains(tmp.Filename,defineFolder);
         preSorted{i} = tmp.PatientID;
         continue;
     else
@@ -212,12 +215,10 @@ parfor i = 1:nFiles
     
     %   Initiate file copy if another output path present
     if isstr(p.Results.output)
-        copyfile(tmp.Filename,fullfile(outPath,tmp.PatientID,...
-            tmp.ProtocolName,newName));
+        copyfile(tmp.Filename,fullfile(defineFolder,newName));
         %   Move them otherwise
     else
-        movefile(tmp.Filename,fullfile(outPath,tmp.PatientID,...
-            tmp.ProtocolName,newName));
+        movefile(tmp.Filename,fullfile(defineFolder,newName));
     end
     
     %   Update parallel process progress
