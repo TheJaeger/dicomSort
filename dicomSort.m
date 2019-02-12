@@ -192,9 +192,10 @@ parfor i = 1:nFiles
         tmp.PatientID = tmp.PatientID;
     end
     
-    %   Define copy/move folder
+    %   Define copy/move folder and replace all '.' with -_-
     defineFolder = fullfile(outPath,tmp.PatientID,...
-            sprintf('%s_%d',tmp.ProtocolName,tmp.SeriesNumber));
+        sprintf('%s_%d',tmp.ProtocolName,tmp.SeriesNumber));
+    defineFolder = strrep(defineFolder,'.','_');
     
     %   Check if a directory 'PatientID/Protocol' exists. If it does, do
     %   nothing. Otherwise, make directry
