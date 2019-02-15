@@ -38,6 +38,7 @@ subjectDir(rmIdx ~= 0) = [];
 %% Sort Dicoms
 parfor j = 1:length(subjectDir)
     %% Create Recirsive Listing
+    studyDirDel = dir(fullfile(studyPath,subjectDir(j).name));
     studyDir = dir(fullfile(studyPath,subjectDir(j).name,'**/*'));
     fprintf('Subject %s: Found %d files\n',subjectDir(j).name,length(studyDir));
     % Clean-up Dicom Directory Listing
@@ -55,15 +56,34 @@ parfor j = 1:length(subjectDir)
             %   If nothing found, don't mark for deletion
             rmIdx(i) = 0;
         end
+        
     end
     studyDir(rmIdx ~= 0) = [];   %   Apply deletion filter
     nFiles = length(studyDir);
- 
+    
+    %   Clean-up Deletion Listing
+    rmIdx = zeros(1,length(studyDirDel));
+    for i = 1:length(studyDirDel)
+        %   Check for files starting with'.'
+        if any(startsWith(studyDirDel(i).name,'.'));
+            rmIdx(i) = 1;
+            %  Check for directories
+        elseif studyDirDel(i).isdir == 1
+            rmIdx(i) = 0;
+            
+        else
+            %   If nothing found, don't mark for deletion
+            rmIdx(i) = 1;
+        end
+        
+    end
+    studyDirDel(rmIdx ~= 0) = [];   %   Apply deletion filter
+    
     for i = 1:nFiles
         try
             tmp = dicominfo(fullfile(studyDir(i).folder,studyDir(i).name));
         catch
-            stop
+            continue
         end
         %   Replace all '.' in protocol names with '_'
         tmp.ProtocolName = strrep(tmp.ProtocolName,'.','_');
@@ -84,6 +104,11 @@ parfor j = 1:length(subjectDir)
             newName = studyDir(i).name;
         end
         movefile(tmp.Filename,fullfile(defineFolder,newName));
+    end
+    
+    %   Delete old folders from StudyDirDel
+    for i = 1:length(studyDirDel)
+        rmdir(fullfile(studyDirDel(i).folder,studyDirDel(i).name),'s');
     end
 end
 fprintf('done\n')
