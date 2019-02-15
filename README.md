@@ -1,5 +1,5 @@
 # dicomsort
-This is a MATLAB function to sort all dicom files in a study directory regardless of folder structure or hierarchy. This flexible script is for sorting your dicoms faster than Trump's approval rating dropped, faster than a pro Genji and faster than Yngwie Malmsteen, . It neither cares about all the other junk you have in your study directory, nor does it care about your organizational skills. It just goes in, sorts fast, so you can breathe easy.
+This is a MATLAB function to sort all dicom files in a study directory regardless of folder structure or hierarchy. This flexible script is for sorting your dicoms faster than Trump's approval rating dropped, faster than a pro Genji and faster than Yngwie Malmsteen. It neither cares about all the other junk you have in your study directory, nor does it care about your organizational skills. It just goes in, sorts fast, so you can breathe easy.
 
 Tired of arranging your subject folder into the right format? BAM, dicomSort that!
 
