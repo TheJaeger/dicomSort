@@ -1,6 +1,6 @@
 function dicomsort(studyPath,varargin)
 % dicomSort is a recursive dicom sorting tool.
-%   dicomsort(input) recursive sorts all dicom files in a study folder
+%   dicomsort(input) recursively sorts all dicom files in a study folder
 %   regardless of directory structure or hierarchy.
 %
 %   Syntax:
