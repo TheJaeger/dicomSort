@@ -184,6 +184,15 @@ studyDir(rmIdx ~= 0) = [];   %   Apply deletion filter
 nFiles = length(studyDir);
 fprintf('Found %d dicom files\n',nFiles);
 
+%% Read Parallel Pool Properties
+curCluster = parcluster('local');
+%   Initialize empty vector same size as number of worrkers for ETA
+%   caclulation
+etaVec = zeros(nFiles,1);
+%   Create exponential moving average object
+movAvg = dsp.MovingAverage('Method','Exponential weighting',...
+    'WindowLength',curCluster.NumWorkers);
+
 %%   Initialize Parallel Data Queue
 parQ = parallel.pool.DataQueue;
 %   Initialize progress waitbar
@@ -201,6 +210,7 @@ j = 1;
 parfor i = 1:nFiles
     %   Test whether file is readable by dicom. If not, move on to next
     %   file instead of throwing an error
+    tic;
     try
         tmp = dicominfo(fullfile(studyDir(i).folder,studyDir(i).name));
     catch
@@ -260,6 +270,7 @@ parfor i = 1:nFiles
     end
     
     %   Update parallel process progress
+    etaVec(i) = toc;
     send(parQ,i);
 end
 fprintf('\n');
@@ -325,10 +336,14 @@ end
         else
             n_completed = n_completed + 1;
         end
-        %   Calculate ETA
+        %   Calculate percentage progress
         parPercentage = n_completed/nFiles*100;
+        %   Calculate ETA
+        meanCurTime = movAvg(nonzeros(etaVec));
+        eta = mean(meanCurTime) * (nFiles - n_completed);
         %   Update waitbar
         waitbar(n_completed/nFiles,parWaitBar,...
-            sprintf('%0.1f%% completed\nHang in there...',parPercentage));
+            sprintf('%0.1f%% completed\nETA:%0.0f sec (%0.1f min)',...
+            parPercentage,eta,eta/60));
     end
 end
