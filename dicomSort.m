@@ -184,12 +184,15 @@ studyDir(rmIdx ~= 0) = [];   %   Apply deletion filter
 nFiles = length(studyDir);
 fprintf('Found %d dicom files\n',nFiles);
 
-%% Initialize Parallel Data Queue
-% Initialized the queue
-q = parallel.pool.DataQueue;
-% After receiving new data, update_progress() will be called
-afterEach(q, @parProgress);
-parProg = 0;
+%%   Initialize Parallel Data Queue
+parQ = parallel.pool.DataQueue;
+%   Initialize progress waitbar
+parWaitBar = waitbar(0,'Initializing sorting algorithm...',...
+    'Name','Sorting dicoms');
+%   After receiving new data, update_progress() will be called
+fprintf('Sorting dicoms...');
+afterEach(parQ,@parProgress);
+n_completed = 0;
 
 %% Sort Dicom Files
 %   Run in parent parfor for speed
@@ -257,7 +260,7 @@ parfor i = 1:nFiles
     end
     
     %   Update parallel process progress
-    send(q,i);
+    send(parQ,i);
 end
 fprintf('\n');
 
@@ -315,15 +318,17 @@ else
     fprintf('Preserving orignal files\n');
 end
 
-    function parProgress()
-        %   parProgress is a parallel pool progress tracker
-        %
-        %   Syntax:
-        %   parProgress() placed at the end of a parfor loop will print it's
-        %   progress
-        n_completed = n_completed + 1;
-        parPrnthg = n_completed/nFiles;
-        parStatus = fprintf('Progress: %.1f', perPrnthg);
-        fprintf(repmat('/b',1,length(num2str(parPrnthg))));
+%% PARFOR Progress Calculation
+    function parProgress(~)
+        if ~exist('n_completed','var')
+            n_completed = 0;
+        else
+            n_completed = n_completed + 1;
+        end
+        %   Calculate ETA
+        parPercentage = n_completed/nFiles*100;
+        %   Update waitbar
+        waitbar(n_completed/nFiles,parWaitBar,...
+            sprintf('%0.1f%% completed\nHang in there...',parPercentage));
     end
 end
