@@ -340,10 +340,11 @@ end
         parPercentage = n_completed/nFiles*100;
         %   Calculate ETA
         meanCurTime = movAvg(nonzeros(etaVec));
-        eta = mean(meanCurTime) * (nFiles - n_completed);
+        eta = meanCurTime(end) * (nFiles - n_completed);
         %   Update waitbar
         waitbar(n_completed/nFiles,parWaitBar,...
             sprintf('%0.1f%% completed\nETA:%0.0f sec (%0.1f min)',...
             parPercentage,eta,eta/60));
     end
+close close parWaitBar; delete close parWaitBar;
 end
