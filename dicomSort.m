@@ -105,10 +105,40 @@ else
     ;
 end
 
+%% Check and Decompress Files if Present
+studyDirFolders = dir(studyPath);
+compressedFiles = vertcat(dir(fullfile(studyPath,'**/*.zip')),...
+    dir(fullfile(studyPath,'**/*.tar')),...
+    dir(fullfile(studyPath,'**/*.gz')));
+
+if length(compressedFiles) >= 1
+    parfor i = 1:length(compressedFiles)
+        %   Check file extension
+        [~,name,ext] = fileparts(fullfile(compressedFiles(i).folder,...
+            compressedFiles(i).name));
+        mkdir(fullfile(compressedFiles(i).folder,name));
+        if ext == '.zip';
+            unzip(fullfile(compressedFiles(i).folder,...
+                compressedFiles(i).name),...
+                fullfile(compressedFiles(i).folder));
+        elseif ext == '.tar'
+            untar(fullfile(compressedFiles(i).folder,...
+                compressedFiles(i).name),...
+                fullfile(compressedFiles(i).folder));
+        elseif ext == '.gz'
+            gunzip(fullfile(compressedFiles(i).folder,...
+                compressedFiles(i).name),...
+                fullfile(compressedFiles(i).folder));
+        else
+            continue
+        end
+    end
+end
+
 %% Tunable Function Variables
 studyDir = vertcat(dir(fullfile(studyPath,'**/*')),...
     dir(fullfile(studyPath,'**/*.dcm'))); %   Recursive directory listing
-studyDirFolders = dir(studyPath);
+
 rmPattern = {'.','.DS_Store'};   %   Remove files beginning with
 
 %% Clean up Main Study Dir Listing
@@ -260,7 +290,11 @@ if exist('preSorted','var') && ~isstr(p.Results.output)
         if ~ismember(studyDirFolders(i).name,preSorted)
             fprintf('%d/%d:    %s\n',i,nComp,...
                 fullfile(studyDirFolders(i).folder,studyDirFolders(i).name));
-            rmdir(fullfile(studyDirFolders(i).folder,studyDirFolders(i).name),'s');
+            if studyDirFolders(i).isdir
+                rmdir(fullfile(studyDirFolders(i).folder,studyDirFolders(i).name),'s');
+            else
+                delete(fullfile(studyDirFolders(i).folder,studyDirFolders(i).name));
+            end
         else
             ;
         end
