@@ -346,5 +346,4 @@ end
             sprintf('%0.1f%% completed\nETA:%0.0f sec (%0.1f min)',...
             parPercentage,eta,eta/60));
     end
-close close parWaitBar; delete close parWaitBar;
 end
