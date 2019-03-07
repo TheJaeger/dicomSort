@@ -240,8 +240,13 @@ parfor i = 1:nFiles
     end
     
     %   Define copy/move folder and replace all '.' with -_-
+    if ~isempty(tmp.ProtocolName)
     defineFolder = fullfile(outPath,tmp.PatientID,...
-        sprintf('%d_%s',tmp.SeriesNumber),tmp.ProtocolName);
+        sprintf('%d_%s',tmp.SeriesNumber,tmp.ProtocolName));
+    else
+        defineFolder = fullfile(outPath,tmp.PatientID,...
+        sprintf('%d',tmp.SeriesNumber));
+    end
     defineFolder = strrep(defineFolder,'.','_');
     
     %   Check if a directory 'PatientID/Protocol' exists. If it does, do
