@@ -242,10 +242,10 @@ parfor i = 1:nFiles
     %   Define copy/move folder and replace all '.' with -_-
     if ~isempty(tmp.ProtocolName)
     defineFolder = fullfile(outPath,tmp.PatientID,...
-        sprintf('%d_%s',tmp.SeriesNumber,tmp.ProtocolName));
+        sprintf('%0.2d_%s',tmp.SeriesNumber,tmp.ProtocolName));
     else
         defineFolder = fullfile(outPath,tmp.PatientID,...
-        sprintf('%d',tmp.SeriesNumber));
+        sprintf('%0.2d',tmp.SeriesNumber));
     end
     defineFolder = strrep(defineFolder,'.','_');
     
